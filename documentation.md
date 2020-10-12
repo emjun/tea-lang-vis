@@ -129,7 +129,7 @@ Tea supports 2 kinds of studies: *observational study* and *experiment*.
 For an observational study, you should describe *contributor variables* and 
 *outcome variables*. 
 ``` 
-experimental_design = {
+study_design = {
     'study type': 'observational study',
     'contributor variables': 'Sport',
     'outcome variables': 'Weight',

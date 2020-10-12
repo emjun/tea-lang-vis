@@ -1,6 +1,7 @@
-from build.lib.tea.ast import DataType
+# from build.lib.tea.ast import DataType
 import tea.api
-from tea.api import define_variables
+from tea.api import Tea
+# from tea.api import define_variables
 import unittest
 from importlib import reload
 
@@ -13,7 +14,8 @@ class ApiTests(unittest.TestCase):
 
     def test_load_data_from_csv(self):
         file_path = DataForTests.get_data_path("UScrime.csv")
-        data_obj = tea.data(file_path)
+        tea_obj = Tea(file_path)
+        data_obj = tea_obj.data
 
         import pandas as pd
 
@@ -27,7 +29,8 @@ class ApiTests(unittest.TestCase):
 
         df = pd.read_csv(file_path)
 
-        data_obj = tea.data(df)
+        tea_obj = Tea(file_path)
+        data_obj = tea_obj.data
         self.assertTrue(data_obj.data.equals(df))
 
     def test_df_is_shallow_copy(self):
@@ -37,13 +40,16 @@ class ApiTests(unittest.TestCase):
 
         df = pd.read_csv(file_path, encoding="utf-8")
 
-        data_obj = tea.data(df)
+        tea_obj = Tea(file_path)
+        data_obj = tea_obj.data
         df = df.applymap(lambda x: x ** 2)  # square all elements
 
         self.assertTrue(df.equals(data_obj.data.applymap(lambda x: x ** 2)))
 
     def test_define_variables_should_give_correct_length(self):
-        vars_to_test = define_variables(DataForTests.variables_to_define)
+        tea_obj = Tea()
+        tea_obj.declare_variables(DataForTests.variables_to_define)
+        vars_to_test = tea_obj.variables
 
         # ASSERT
         self.assertEqual(len(vars_to_test), 4)
@@ -52,7 +58,9 @@ class ApiTests(unittest.TestCase):
         expected_names = ["NominalT", "IntervalT", "OrdinalT", "RatioT"]
 
         # ACT
-        vars_to_test = define_variables(DataForTests.variables_to_define)
+        tea_obj = Tea()
+        tea_obj.declare_variables(DataForTests.variables_to_define)
+        vars_to_test = tea_obj.variables
         real_names = [var.name for var in vars_to_test]
 
         # ASSERT
@@ -61,7 +69,9 @@ class ApiTests(unittest.TestCase):
     def test_define_variables_should_have_correct_types(self):
         from tea.runtimeDataStructures.variable import NominalVariable, OrdinalVariable, NumericVariable
 
-        vars_to_test = define_variables(DataForTests.variables_to_define)
+        tea_obj = Tea()
+        tea_obj.declare_variables(DataForTests.variables_to_define)
+        vars_to_test = tea_obj.variables
         sorted_vars = sorted(vars_to_test, key=lambda x: x.name)
         self.assertIsInstance(sorted_vars[0], NumericVariable)  # IntervalT
         self.assertIsInstance(sorted_vars[1], NominalVariable)  # NominalT
@@ -97,7 +107,9 @@ class DataForTests:
                 csv_name = DataForTests.file_names[i]
 
                 csv_url = os.path.join(DataForTests.base_url, csv_name)
-                DataForTests.data_paths[i] = tea.download_data(csv_url, csv_name)
+                tea_obj = Tea()
+                DataForTests.data_paths[i] = tea_obj.data.load(csv_url, csv_name)
+                # DataForTests.data_paths[i] = tea.download_data(csv_url, csv_name)
 
         load_data()
         try:

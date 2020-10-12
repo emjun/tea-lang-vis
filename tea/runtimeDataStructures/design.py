@@ -1,7 +1,7 @@
 import attr
 from typing import Dict
 
-from tea.global_vals import *
+from tea.helpers.constants.default_values import *
 from tea.runtimeDataStructures.variable import AbstractVariable, NominalVariable, OrdinalVariable, NumericVariable
 
 

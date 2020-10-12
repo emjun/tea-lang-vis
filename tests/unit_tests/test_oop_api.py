@@ -103,18 +103,17 @@ class ApiTests(unittest.TestCase):
         from tea.runtimeDataStructures.design import AbstractDesign, ObservationalDesign, ExperimentDesign
         tea_vars = tea_obj.variables
         tea_design = tea_obj.design
-        tea_design = tea_obj.design
         design_xs = tea_design.xs
-        design_ys = tea_design.ys
+        self.assertRaises(AttributeError, getattr, tea_design, "ys")
         self.assertIsInstance(tea_design, ObservationalDesign)
         self.assertIsInstance(design_xs, list)
         self.assertEquals(tea_vars[0], design_xs[0])
-        self.assertIsNone(design_ys)
 
-    def test_specify_design_after_variables_with_two_variables(self): 
+    def test_specify_design_after_variables_with_two_xs(self): 
         # ACT
         tea_obj = tea.Tea()
         tea_obj.declare_variables(DataForTests.variables_to_define)
+        tea_obj.specify_design(DataForTests.design_list_x_one_y)
 
         # ASSERT
         from tea.runtimeDataStructures.design import AbstractDesign, ObservationalDesign, ExperimentDesign
@@ -174,11 +173,11 @@ class DataForTests:
                     }
     design_one_x_one_y = {     "study type": "observational study", 
                             "contributor variable": "RatioT",
-                            "explanatory variable": "NominalT"
+                            "outcome variable": "NominalT"
                     }
     design_list_x_one_y = {   "study type": "observational study", 
                             "contributor variables": ["RatioT", "OrdinalT", "NumericT"],
-                            "explanatory variable": "NominalT"
+                            "outcome variable": "NominalT"
                     }
     # TODO: Do we need this??!?
     # design_one_x_list_y = {   "study type": "observational study", 
